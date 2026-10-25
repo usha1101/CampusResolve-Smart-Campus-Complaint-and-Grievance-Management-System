@@ -10,15 +10,27 @@ class Settings(BaseSettings):
     APP_NAME: str = "CampusResolve API"
     
     # CORS
-    CORS_ORIGINS: Union[List[str], str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
+    CORS_ORIGINS: Union[List[str], str] = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://campusresolve-pied.vercel.app",
+    ]
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
-        if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",")]
-        elif isinstance(v, str) and v.startswith("["):
-            return json.loads(v)
+        if isinstance(v, str):
+            v = v.strip()
+            if v.startswith("[") and v.endswith("]"):
+                try:
+                    loaded = json.loads(v)
+                    if isinstance(loaded, list):
+                        return [i.strip().rstrip("/") for i in loaded if isinstance(i, str) and i.strip()]
+                except Exception:
+                    pass
+            return [i.strip().rstrip("/") for i in v.split(",") if i.strip()]
+        elif isinstance(v, list):
+            return [i.strip().rstrip("/") for i in v if isinstance(i, str) and i.strip()]
         return v
 
     # Database

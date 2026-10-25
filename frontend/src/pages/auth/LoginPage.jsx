@@ -29,7 +29,18 @@ export function LoginPage() {
         navigate("/student");
       }
     } catch (err) {
-      setError(err.response?.data?.detail || "Invalid email or password. Please try again.");
+      let message = "Invalid email or password. Please try again.";
+      if (err.response?.data?.detail) {
+        const detail = err.response.data.detail;
+        if (typeof detail === "string") {
+          message = detail;
+        } else if (Array.isArray(detail)) {
+          message = detail.map((d) => d.msg || JSON.stringify(d)).join(", ");
+        }
+      } else if (err.message === "Network Error") {
+        message = "Unable to connect to the backend server. The server may be waking up, please wait a moment and try again.";
+      }
+      setError(message);
     } finally {
       setLoading(false);
     }

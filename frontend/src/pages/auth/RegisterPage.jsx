@@ -49,7 +49,18 @@ export function RegisterPage() {
       await register(payload);
       navigate("/login?registered=true");
     } catch (err) {
-      setError(err.response?.data?.detail || "Registration failed. Please check your details.");
+      let message = "Registration failed. Please check your details.";
+      if (err.response?.data?.detail) {
+        const detail = err.response.data.detail;
+        if (typeof detail === "string") {
+          message = detail;
+        } else if (Array.isArray(detail)) {
+          message = detail.map((d) => d.msg || JSON.stringify(d)).join(", ");
+        }
+      } else if (err.message === "Network Error") {
+        message = "Unable to connect to the backend server. The server may be waking up, please wait a moment and try again.";
+      }
+      setError(message);
     } finally {
       setLoading(false);
     }

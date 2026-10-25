@@ -122,3 +122,13 @@ def test_admin_analytics_overview(client, admin_auth_headers):
     assert "total_complaints" in data
     assert "status_breakdown" in data
     assert "departments_summary" in data
+
+
+def test_get_departments_public(client):
+    """Ensure unauthenticated users on register page can fetch departments."""
+    response = client.get("/api/v1/departments/")
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data, list)
+    assert len(data) >= 1
+    assert any(d["code"] == "IT" for d in data)

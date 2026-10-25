@@ -14,8 +14,7 @@ router = APIRouter(prefix="/departments", tags=["Departments"])
 @router.get("/", response_model=List[DepartmentResponse])
 def get_departments(
     is_active: bool = True,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    db: Session = Depends(get_db)
 ):
     """List campus operational departments for selection."""
     departments = DepartmentService.list_departments(db, is_active=is_active)

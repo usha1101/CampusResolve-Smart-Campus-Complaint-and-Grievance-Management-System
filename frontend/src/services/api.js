@@ -26,8 +26,12 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Clear token and trigger redirect if not already on login
-      if (!window.location.pathname.includes("/login")) {
+      const isAuthPage =
+        window.location.pathname.includes("/login") ||
+        window.location.pathname.includes("/register");
+
+      // Clear token and trigger redirect only if user is on a protected dashboard page
+      if (!isAuthPage) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         window.location.href = "/login?session_expired=true";
